@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.WeakHashMap;
 
 /**
+ *
  * Created by timfreiheit on 21.10.15.
  */
 public class ActivityResponseDelegate<T> implements Parcelable {
@@ -61,8 +62,8 @@ public class ActivityResponseDelegate<T> implements Parcelable {
 
     // SparseArray to store the Classes of the used responses
     // declare the SparseArray with generic type Object to store it in Parcel
-    private SparseArray mActivityResultCallbacks = new SparseArray<>();
-    private SparseArray mPermissionCallbacks = new SparseArray<>();
+    private SparseArray<Object> mActivityResultCallbacks = new SparseArray<>();
+    private SparseArray<Object> mPermissionCallbacks = new SparseArray<>();
 
     /**
      * stores the delegate state to the bundle
@@ -82,6 +83,7 @@ public class ActivityResponseDelegate<T> implements Parcelable {
      * @param savedInstanceState savedInstanceState
      * @see Activity#onRestoreInstanceState(Bundle)
      */
+    @SuppressWarnings("unchecked")
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             ActivityResponseDelegate delegate = savedInstanceState.getParcelable(BUNDLE_KEY);
@@ -328,6 +330,7 @@ public class ActivityResponseDelegate<T> implements Parcelable {
         return 0;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(uniqueActivityResultRequestCode);
@@ -340,8 +343,8 @@ public class ActivityResponseDelegate<T> implements Parcelable {
     protected ActivityResponseDelegate<T> readFromParcel(Parcel in) {
         uniqueActivityResultRequestCode = in.readInt();
         uniquePermissionRequestCode = in.readInt();
-        mActivityResultCallbacks = in.readSparseArray(Class.class.getClassLoader());
-        mPermissionCallbacks = in.readSparseArray(Class.class.getClassLoader());
+        mActivityResultCallbacks = in.readSparseArray(null);
+        mPermissionCallbacks = in.readSparseArray(null);
         return this;
     }
 
