@@ -184,27 +184,9 @@ public class ActivityResponseDelegate<T> implements Parcelable {
      * @param callback the class which handles the callback
      * @see Activity#requestPermissions(String[], int)
      */
-    public void requestPermissions(final @NonNull String permission,
-                                   final Class<? extends RequestPermissionCallback<? super T>> callback) {
-        requestPermissions(new String[]{permission}, nextPermissionRequestCode(), callback);
-    }
-
-    /**
-     * @param callback the class which handles the callback
-     * @see Activity#requestPermissions(String[], int)
-     */
     public void requestPermissions(final @NonNull String[] permissions,
                                    final Class<? extends RequestPermissionCallback<? super T>> callback) {
         requestPermissions(permissions, nextPermissionRequestCode(), callback);
-    }
-
-    /**
-     * @param callback the class which handles the callback
-     * @see Activity#requestPermissions(String[], int)
-     */
-    public void requestPermissions(final @NonNull String permission, final int requestCode,
-                                   final Class<? extends RequestPermissionCallback<? super T>> callback) {
-        requestPermissions(new String[]{permission}, requestCode, callback);
     }
 
     /**

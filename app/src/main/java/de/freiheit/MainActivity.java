@@ -32,7 +32,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_camera:
-                ActivityResponseDelegate.from(this).requestPermissions(Manifest.permission.CAMERA,
+                ActivityResponseDelegate.from(this).requestPermissions(
+                        new String[]{Manifest.permission.CAMERA},
                         ShowCameraCallback.class);
                 break;
             case R.id.button_contacts:
