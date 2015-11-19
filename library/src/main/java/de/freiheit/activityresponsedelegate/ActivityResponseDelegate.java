@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.util.SparseArray;
 
 import java.lang.ref.WeakReference;
@@ -25,8 +26,18 @@ import java.util.WeakHashMap;
  */
 public class ActivityResponseDelegate<T> implements Parcelable {
 
+    private final static String TAG = ActivityResponseDelegate.class.getSimpleName();
+
     private final static String BUNDLE_KEY = ActivityResponseDelegate.class.getName() + "_BUNDLE_KEY";
     private final static WeakHashMap<Object, ActivityResponseDelegate> cache = new WeakHashMap<>();
+
+    private static ActivityResponseConfig globalConfig = new ActivityResponseConfig.Builder().build();
+
+    public static void setGlobalConfig(ActivityResponseConfig config){
+        if (config != null) {
+            globalConfig = config;
+        }
+    }
 
     public static <T extends Activity> ActivityResponseDelegate<T> from(T owner) {
         return fromRaw(owner);
@@ -64,6 +75,20 @@ public class ActivityResponseDelegate<T> implements Parcelable {
     // declare the SparseArray with generic type Object to store it in Parcel
     private SparseArray<Object> mActivityResultCallbacks = new SparseArray<>();
     private SparseArray<Object> mPermissionCallbacks = new SparseArray<>();
+    private ActivityResponseConfig config;
+
+    public void setConfig(ActivityResponseConfig config) {
+        if (config != null) {
+            this.config = config;
+        }
+    }
+
+    ActivityResponseConfig getConfig(){
+        if (config == null) {
+            return globalConfig;
+        }
+        return config;
+    }
 
     /**
      * stores the delegate state to the bundle
@@ -114,23 +139,7 @@ public class ActivityResponseDelegate<T> implements Parcelable {
             Intent intent,
             int requestCode,
             final Class<? extends ActivityResultCallback<? super T>> callback) {
-
-        T owner = mOwner.get();
-        if (owner == null) {
-            return;
-        }
-
-        mActivityResultCallbacks.put(requestCode, callback);
-
-        if (owner instanceof Activity) {
-            ((Activity) owner).startActivityForResult(intent, requestCode);
-        } else if (owner instanceof Fragment) {
-            ((Fragment) owner).startActivityForResult(intent, requestCode);
-        } else if (owner instanceof android.support.v4.app.Fragment) {
-            ((android.support.v4.app.Fragment) owner).startActivityForResult(intent, requestCode);
-        } else {
-            throw new ClassCastException("owner must be an Activity or Fragment");
-        }
+        startActivityForResult(intent, requestCode, null, callback);
     }
 
     /**
@@ -144,6 +153,10 @@ public class ActivityResponseDelegate<T> implements Parcelable {
             @Nullable Bundle options,
             final Class<? extends ActivityResultCallback<? super T>> callback) {
 
+        if (getConfig().isDebugLogsEnabled()) {
+            Log.d(TAG, "startActivityForResult from " + mOwner + " with callback " + callback.getSimpleName());
+        }
+
         T owner = mOwner.get();
         if (owner == null) {
             return;
@@ -152,9 +165,17 @@ public class ActivityResponseDelegate<T> implements Parcelable {
         mActivityResultCallbacks.put(requestCode, callback);
 
         if (owner instanceof Activity) {
-            ((Activity) owner).startActivityForResult(intent, requestCode, options);
+            if (options != null) {
+                ((Activity) owner).startActivityForResult(intent, requestCode, options);
+            } else {
+                ((Activity) owner).startActivityForResult(intent, requestCode);
+            }
         } else if (owner instanceof Fragment) {
-            ((Fragment) owner).startActivityForResult(intent, requestCode, options);
+            if (options != null) {
+                ((Fragment) owner).startActivityForResult(intent, requestCode, options);
+            } else {
+                ((Fragment) owner).startActivityForResult(intent, requestCode);
+            }
         } else if (owner instanceof android.support.v4.app.Fragment) {
             ((android.support.v4.app.Fragment) owner).startActivityForResult(intent, requestCode);
         } else {
@@ -172,13 +193,16 @@ public class ActivityResponseDelegate<T> implements Parcelable {
             return;
         }
         ActivityResultCallback<T> callback = getActivityResultCallbackObject(requestCode);
+
+        if (getConfig().isDebugLogsEnabled()) {
+            Log.d(TAG, "onActivityResult from " + mOwner + " with callback " + callback);
+        }
+
         if (callback != null) {
             callback.onActivityResult(owner, requestCode, resultCode, data);
             mActivityResultCallbacks.remove(requestCode);
         }
     }
-
-    // start handling android.support.v4.app.Fragment
 
     /**
      * @param callback the class which handles the callback
@@ -205,6 +229,12 @@ public class ActivityResponseDelegate<T> implements Parcelable {
     public void requestPermissions(final @NonNull String[] permissions, final int requestCode,
                                    final Class<? extends RequestPermissionCallback<? super T>> callback,
                                    boolean showRational) {
+
+
+        if (getConfig().isDebugLogsEnabled()) {
+            Log.d(TAG, "requestPermissions from " + mOwner + " with callback " + callback.getSimpleName() + ". Permissions: " + Arrays.asList(permissions).toString());
+        }
+
         T owner = mOwner.get();
         if (owner == null) {
             return;
@@ -261,7 +291,13 @@ public class ActivityResponseDelegate<T> implements Parcelable {
         if (owner == null) {
             return;
         }
+
         RequestPermissionCallback<T> callback = getRequestPermissionCallbackObject(requestCode);
+
+        if (getConfig().isDebugLogsEnabled()) {
+            Log.d(TAG, "onRequestPermissionsResult from " + mOwner + " with callback " + callback + ". Permissions: " + Arrays.asList(permissions).toString());
+        }
+
         if (callback != null) {
             callback.onRequestPermissionsResult(owner, requestCode, permissions, grantResults);
             mPermissionCallbacks.remove(requestCode);
