@@ -127,3 +127,19 @@ pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
 ActivityResponseDelegate.from(this).startActivityForResult(pickContactIntent, PickContactCallback.class);
 
 ```
+
+
+## Install
+
+```groovy
+
+repositories {    
+    // ...    
+    maven { url "https://jitpack.io" }   
+}   
+
+dependencies {    
+    compile 'com.github.timfreiheit:ActivityResponseDelegate:0.1'   
+}  
+
+```
