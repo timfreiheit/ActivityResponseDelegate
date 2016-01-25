@@ -21,10 +21,17 @@ import java.util.Arrays;
 import java.util.WeakHashMap;
 
 /**
+ * the core class to start activities or ask for permissions
+ * make sure to send lifecycle events to this class
+ *
+ * {@link #onRestoreInstanceState(Bundle)}
+ * {@link #onSaveInstanceState(Bundle)}
+ * {@link #onActivityResult(int, int, Intent)} (Bundle)}
+ * {@link #onRequestPermissionsResult(int, String[], int[])} (Bundle)}s
  *
  * Created by timfreiheit on 21.10.15.
  */
-public class ActivityResponseDelegate<T> implements Parcelable {
+public final class ActivityResponseDelegate<T> implements Parcelable {
 
     private final static String TAG = ActivityResponseDelegate.class.getSimpleName();
 
@@ -72,7 +79,10 @@ public class ActivityResponseDelegate<T> implements Parcelable {
 
 
     WeakReference<T> mOwner;
-    private int uniqueActivityResultRequestCode = 0;
+
+    // use 100 as start request code
+    // try to avoid other request codes used in the app
+    private int uniqueActivityResultRequestCode = 100;
     private int uniquePermissionRequestCode = 0;
 
     // SparseArray to store the CallbackHolder<T> of the used responses
