@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -112,6 +113,20 @@ public class PermissionUtils {
     public static boolean shouldShowRequestPermissionRationale(Fragment fragment, String... permissions) {
         for (String permission : permissions) {
             if (fragment.shouldShowRequestPermissionRationale(permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isAnyRevokedByPolicy(Context context, String... permissions) {
+        if (Build.VERSION.SDK_INT <= 23) {
+            return false;
+        }
+        PackageManager packageManager = context.getPackageManager();
+        String pkg = context.getPackageName();
+        for (String permission : permissions) {
+            if (packageManager.isPermissionRevokedByPolicy(permission, pkg)) {
                 return true;
             }
         }
