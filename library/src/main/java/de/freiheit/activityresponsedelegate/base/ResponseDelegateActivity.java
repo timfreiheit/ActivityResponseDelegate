@@ -3,12 +3,13 @@ package de.freiheit.activityresponsedelegate.base;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 import de.freiheit.activityresponsedelegate.ActivityResponseDelegate;
 
 /**
  * useful base class when using {@link ActivityResponseDelegate}
- *
+ * <p>
  * Created by timfreiheit on 25.01.16.
  */
 public class ResponseDelegateActivity extends Activity {

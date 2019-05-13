@@ -1,17 +1,15 @@
 package de.freiheit;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import de.freiheit.activityresponsedelegate.ActivityResponseDelegate;
 import de.freiheit.activityresponsedelegate.ActivityResponseCallback;
 import de.freiheit.basic.BaseActivity;

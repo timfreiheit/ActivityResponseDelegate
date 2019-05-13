@@ -7,13 +7,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-
 import java.util.ArrayList;
 
-import static android.support.v4.content.PermissionChecker.checkSelfPermission;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+
+import static androidx.core.content.PermissionChecker.checkSelfPermission;
 
 public class PermissionUtils {
 
@@ -67,7 +66,6 @@ public class PermissionUtils {
         return false;
     }
 
-
     /**
      * Checks given permissions are needed to show rationale.
      *
@@ -79,24 +77,6 @@ public class PermissionUtils {
         ArrayList<String> list = new ArrayList<>(permissions.length);
         for (String permission : permissions) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-                list.add(permission);
-            }
-        }
-        return list.toArray(new String[list.size()]);
-    }
-
-
-    /**
-     * Checks given permissions are needed to show rationale.
-     *
-     * @param fragment    fragment
-     * @param permissions permission list
-     * @return returns the permissions for which to show rationale
-     */
-    public static String[] getShowRequestPermissionRationale(android.support.v4.app.Fragment fragment, String... permissions) {
-        ArrayList<String> list = new ArrayList<>(permissions.length);
-        for (String permission : permissions) {
-            if (fragment.shouldShowRequestPermissionRationale(permission)) {
                 list.add(permission);
             }
         }

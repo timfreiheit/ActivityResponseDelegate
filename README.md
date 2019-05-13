@@ -134,7 +134,7 @@ repositories {
 }   
 
 dependencies {    
-    compile 'com.github.timfreiheit:ActivityResponseDelegate:0.2'
+    implementation 'com.github.timfreiheit:ActivityResponseDelegate:0.4'
 }  
 
 ```

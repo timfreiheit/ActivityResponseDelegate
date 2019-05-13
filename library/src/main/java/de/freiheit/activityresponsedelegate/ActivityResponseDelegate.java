@@ -2,17 +2,12 @@ package de.freiheit.activityresponsedelegate;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v13.app.FragmentCompat;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -20,15 +15,20 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.WeakHashMap;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+
 /**
  * the core class to start activities or ask for permissions
  * make sure to send lifecycle events to this class
- *
+ * <p>
  * {@link #onRestoreInstanceState(Bundle)}
  * {@link #onSaveInstanceState(Bundle)}
  * {@link #onActivityResult(int, int, Intent)} (Bundle)}
  * {@link #onRequestPermissionsResult(int, String[], int[])} (Bundle)}s
- *
+ * <p>
  * Created by timfreiheit on 21.10.15.
  */
 public final class ActivityResponseDelegate<T> implements Parcelable {
@@ -40,7 +40,7 @@ public final class ActivityResponseDelegate<T> implements Parcelable {
 
     private static ActivityResponseConfig globalConfig = new ActivityResponseConfig.Builder().build();
 
-    public static void setGlobalConfig(ActivityResponseConfig config){
+    public static void setGlobalConfig(ActivityResponseConfig config) {
         if (config != null) {
             globalConfig = config;
         }
@@ -51,10 +51,6 @@ public final class ActivityResponseDelegate<T> implements Parcelable {
     }
 
     public static <T extends Fragment> ActivityResponseDelegate<T> from(T owner) {
-        return fromRaw(owner);
-    }
-
-    public static <T extends android.support.v4.app.Fragment> ActivityResponseDelegate<T> from(T owner) {
         return fromRaw(owner);
     }
 
@@ -97,7 +93,7 @@ public final class ActivityResponseDelegate<T> implements Parcelable {
         }
     }
 
-    ActivityResponseConfig getConfig(){
+    ActivityResponseConfig getConfig() {
         if (config == null) {
             return globalConfig;
         }
@@ -174,11 +170,9 @@ public final class ActivityResponseDelegate<T> implements Parcelable {
     }
 
     /**
-     *
-     * @see android.app.Activity#startActivityForResult(Intent, int, Bundle)
-     *
-     * @param callback the class of the callback
+     * @param callback          the class of the callback
      * @param callbackArguments the arguments passed to the callback
+     * @see android.app.Activity#startActivityForResult(Intent, int, Bundle)
      */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void startActivityForResult(
@@ -210,8 +204,6 @@ public final class ActivityResponseDelegate<T> implements Parcelable {
             } else {
                 ((Fragment) owner).startActivityForResult(intent, requestCode);
             }
-        } else if (owner instanceof android.support.v4.app.Fragment) {
-            ((android.support.v4.app.Fragment) owner).startActivityForResult(intent, requestCode);
         } else {
             throw new ClassCastException("owner must be an Activity or Fragment");
         }
@@ -279,12 +271,11 @@ public final class ActivityResponseDelegate<T> implements Parcelable {
     }
 
     /**
-     *
-     * @see android.app.Activity#requestPermissions(String[], int)
-     * @param callback the class of the callback
+     * @param callback          the class of the callback
      * @param callbackArguments the arguments passed to the callback
-     * @param showRational if true the callback will ask to show a rationale
-     *                     set this to false when calling this after showing the rational to avoid an infinite loop
+     * @param showRational      if true the callback will ask to show a rationale
+     *                          set this to false when calling this after showing the rational to avoid an infinite loop
+     * @see android.app.Activity#requestPermissions(String[], int)
      */
     public void requestPermissions(final @NonNull String[] permissions, final int requestCode,
                                    final Class<? extends ActivityResponseCallback<? super T>> callback,
@@ -305,8 +296,6 @@ public final class ActivityResponseDelegate<T> implements Parcelable {
             context = (Activity) owner;
         } else if (owner instanceof Fragment) {
             context = ((Fragment) owner).getActivity();
-        } else if (owner instanceof android.support.v4.app.Fragment) {
-            context = ((android.support.v4.app.Fragment) owner).getActivity();
         } else {
             throw new ClassCastException("owner must be an Activity or Fragment");
         }
@@ -339,13 +328,8 @@ public final class ActivityResponseDelegate<T> implements Parcelable {
 
         if (owner instanceof Activity) {
             ActivityCompat.requestPermissions((Activity) owner, permissions, requestCode);
-        } else if (owner instanceof Fragment) {
-            FragmentCompat.requestPermissions((Fragment) owner, permissions, requestCode);
-        } else //noinspection ConstantConditions
-            if (owner instanceof android.support.v4.app.Fragment) {
-            ((android.support.v4.app.Fragment) owner).requestPermissions(permissions, requestCode);
         } else {
-            throw new ClassCastException("owner must be an Activity or Fragment");
+            ((Fragment) owner).requestPermissions(permissions, requestCode);
         }
     }
 
